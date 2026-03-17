@@ -1,0 +1,43 @@
+name: Deploy to AWS EC2
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Deploy to EC2
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.EC2_HOST }}
+        username: ec2-user
+        key: ${{ secrets.EC2_KEY }}
+        script: |
+          echo "=== Deploying onlineBakala ==="
+          
+          # Update HTML files
+          sudo cp /home/ec2-user/onlinebakala-repo/*.html /var/www/html/ 2>/dev/null || true
+          
+          # Pull latest code
+          cd /home/ec2-user/onlinebakala-repo
+          git pull origin main
+          
+          # Copy HTML to web root
+          sudo cp *.html /var/www/html/
+          
+          # Update backend
+          cd /home/ec2-user/onlinebakala
+          git pull origin main 2>/dev/null || true
+          npm install --production
+          
+          # Restart Node.js
+          pm2 restart onlinebakala || pm2 start ecosystem.config.js
+          pm2 save
+          
+          echo "=== Deployment complete ==="
