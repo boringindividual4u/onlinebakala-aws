@@ -12,11 +12,23 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v3
 
-    - name: Deploy to EC2
+    - name: Copy files to EC2
+      uses: appleboy/scp-action@master
+      with:
+        host: ${{ secrets.EC2_HOST }}
+        username: ec2-user
+        key: ${{ secrets.EC2_KEY }}
+        source: "*.html"
+        target: "/home/ec2-user/deploy/"
+
+    - name: Deploy on EC2
       uses: appleboy/ssh-action@master
       with:
         host: ${{ secrets.EC2_HOST }}
         username: ec2-user
         key: ${{ secrets.EC2_KEY }}
+        command_timeout: 60s
         script: |
-          echo "=== Deploying onlineBakala ==="
+          sudo cp /home/ec2-user/deploy/*.html /var/www/html/
+          pm2 restart onlinebakala
+          echo "Done"
