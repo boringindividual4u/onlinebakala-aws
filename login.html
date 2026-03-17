@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign In - onlineBakala</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #131921;
+            --secondary: #232f3e;
+            --accent: #febd69;
+            --accent-dark: #f3a847;
+            --blue: #007185;
+            --red: #B12704;
+            --text: #0F1111;
+            --muted: #565959;
+            --border: #DDD;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', Arial, sans-serif;
+            background: #f3f3f3;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        header {
+            background: var(--primary);
+            padding: 1rem;
+            text-align: center;
+            border-bottom: 1px solid #3a4553;
+        }
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: white;
+            text-decoration: none;
+        }
+        .logo span { color: var(--accent); }
+
+        .page {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem 1rem;
+        }
+
+        .card {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 2rem;
+            width: 100%;
+            max-width: 350px;
+        }
+        .card h1 {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 1.2rem;
+        }
+
+        .form-group { margin-bottom: 0.9rem; }
+        label {
+            display: block;
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 0.3rem;
+        }
+        input {
+            width: 100%;
+            padding: 0.6rem 0.8rem;
+            border: 1px solid #a6a6a6;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            outline: none;
+            font-family: inherit;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        input:focus {
+            border-color: #e77600;
+            box-shadow: 0 0 0 3px rgba(231,118,0,0.25);
+        }
+        input.err { border-color: var(--red); }
+
+        .field-error {
+            font-size: 0.75rem;
+            color: var(--red);
+            margin-top: 0.2rem;
+            display: none;
+        }
+
+        .btn-signin {
+            width: 100%;
+            padding: 0.65rem;
+            background: linear-gradient(to bottom, #f7dfa5, #f0c14b);
+            color: var(--text);
+            border: 1px solid #a88734;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 0.5rem;
+            transition: background 0.2s;
+            font-family: inherit;
+        }
+        .btn-signin:hover {
+            background: linear-gradient(to bottom, #f0c14b, #e8ac0e);
+        }
+
+        .error-box {
+            background: #fff3f3;
+            border: 1px solid #df3312;
+            border-left: 4px solid #df3312;
+            border-radius: 4px;
+            padding: 0.7rem 0.9rem;
+            font-size: 0.82rem;
+            color: #df3312;
+            margin-bottom: 1rem;
+            display: none;
+        }
+
+        .terms {
+            font-size: 0.75rem;
+            color: var(--muted);
+            text-align: center;
+            margin-top: 0.8rem;
+            line-height: 1.5;
+        }
+        .terms a { color: var(--blue); text-decoration: none; }
+        .terms a:hover { text-decoration: underline; color: #c45500; }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            margin: 1.2rem 0;
+        }
+        .divider::before, .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border);
+        }
+        .divider span { font-size: 0.78rem; color: var(--muted); white-space: nowrap; }
+
+        .btn-new {
+            width: 100%;
+            padding: 0.6rem;
+            background: linear-gradient(to bottom, #f7f8fa, #e7e9ec);
+            color: var(--text);
+            border: 1px solid #adb1b8;
+            border-radius: 4px;
+            font-size: 0.88rem;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: inherit;
+            text-align: center;
+            text-decoration: none;
+            display: block;
+        }
+        .btn-new:hover { background: linear-gradient(to bottom, #e7e9ec, #d9dce1); }
+
+        .help-links {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+            flex-wrap: wrap;
+        }
+        .help-links a {
+            font-size: 0.78rem;
+            color: var(--blue);
+            text-decoration: none;
+        }
+        .help-links a:hover { text-decoration: underline; }
+
+        footer {
+            background: #f3f3f3;
+            border-top: 1px solid var(--border);
+            padding: 1.5rem 1rem;
+            text-align: center;
+        }
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+            margin-bottom: 0.8rem;
+        }
+        .footer-links a {
+            font-size: 0.75rem;
+            color: var(--blue);
+            text-decoration: none;
+        }
+        .footer-links a:hover { text-decoration: underline; }
+        .footer-copy {
+            font-size: 0.72rem;
+            color: var(--muted);
+        }
+        .footer-logo {
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: var(--text);
+            margin-bottom: 0.8rem;
+        }
+        .footer-logo span { color: var(--accent-dark); }
+
+        .show-pwd {
+            font-size: 0.78rem;
+            color: var(--blue);
+            cursor: pointer;
+            float: right;
+            margin-top: -0.1rem;
+        }
+        .show-pwd:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+
+<header>
+    <a href="index.html" class="logo">online<span>Bakala</span></a>
+</header>
+
+<div class="page">
+    <div class="card">
+        <h1>Sign In</h1>
+
+        <div class="error-box" id="error-box"></div>
+
+        <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" id="email" placeholder="you@example.com" autocomplete="email">
+            <div class="field-error" id="email-err">Please enter a valid email.</div>
+        </div>
+
+        <div class="form-group">
+            <label for="password">
+                Password
+                <span class="show-pwd" onclick="togglePwd()">Show</span>
+            </label>
+            <input type="password" id="password" placeholder="Enter your password" autocomplete="current-password">
+            <div class="field-error" id="pwd-err">Password is required.</div>
+        </div>
+
+        <button class="btn-signin" id="signin-btn" onclick="login()">
+            Sign In
+        </button>
+
+        <p class="terms">
+            By signing in, you agree to onlineBakala's
+            <a href="#">Conditions of Use</a> and
+            <a href="#">Privacy Notice</a>.
+        </p>
+    </div>
+
+    <div class="help-links">
+        <a href="#">Forgot password?</a>
+        <a href="#">Other issues with sign-in</a>
+    </div>
+
+    <div class="card" style="margin-top:1.5rem">
+        <div class="divider"><span>New to onlineBakala?</span></div>
+        <a href="signup.html" class="btn-new">Create your onlineBakala account</a>
+    </div>
+</div>
+
+<footer>
+    <div class="footer-logo">online<span>Bakala</span></div>
+    <div class="footer-links">
+        <a href="#">Conditions of Use</a>
+        <a href="#">Privacy Notice</a>
+        <a href="#">Help</a>
+        <a href="#">Cookies</a>
+    </div>
+    <div class="footer-copy">© 2026 onlineBakala.pk</div>
+</footer>
+
+<script>
+function togglePwd() {
+    const i = document.getElementById('password');
+    const s = event.target;
+    if (i.type === 'password') { i.type = 'text'; s.textContent = 'Hide'; }
+    else { i.type = 'password'; s.textContent = 'Show'; }
+}
+
+function clearErrors() {
+    document.getElementById('error-box').style.display = 'none';
+    document.querySelectorAll('.field-error').forEach(e => e.style.display = 'none');
+    document.querySelectorAll('input').forEach(i => i.classList.remove('err'));
+}
+
+function showFieldError(id, inputId) {
+    document.getElementById(id).style.display = 'block';
+    document.getElementById(inputId).classList.add('err');
+}
+
+async function login() {
+    clearErrors();
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value;
+
+    let valid = true;
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        showFieldError('email-err', 'email'); valid = false;
+    }
+    if (!password) {
+        showFieldError('pwd-err', 'password'); valid = false;
+    }
+    if (!valid) return;
+
+    const btn = document.getElementById('signin-btn');
+    btn.disabled = true;
+    btn.textContent = 'Signing in...';
+
+    try {
+        const res = await fetch('/api/auth/login', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ email, password }),
+            credentials: 'include'
+        });
+        const data = await res.json();
+
+        if (res.ok) {
+            localStorage.setItem('user', JSON.stringify(data.user));
+            window.location.href = 'dashboard.html';
+        } else {
+            const box = document.getElementById('error-box');
+            box.textContent = data.error || 'Invalid email or password.';
+            box.style.display = 'block';
+            btn.disabled = false;
+            btn.textContent = 'Sign In';
+        }
+    } catch {
+        const box = document.getElementById('error-box');
+        box.textContent = 'Connection error. Please try again.';
+        box.style.display = 'block';
+        btn.disabled = false;
+        btn.textContent = 'Sign In';
+    }
+}
+
+document.addEventListener('keypress', e => { if (e.key === 'Enter') login(); });
+
+// Redirect if already logged in
+if (localStorage.getItem('user')) window.location.href = 'dashboard.html';
+</script>
+</body>
+</html>
+

@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Orders - onlineBakala</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #131921;
+            --secondary: #232f3e;
+            --accent: #febd69;
+            --accent-dark: #f3a847;
+            --blue: #007185;
+            --red: #B12704;
+            --green: #007600;
+            --text: #0F1111;
+            --muted: #565959;
+            --border: #DDD;
+            --bg: #eaeded;
+            --card-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', Arial, sans-serif; background: var(--bg); color: var(--text); }
+
+        nav {
+            background: var(--secondary);
+            padding: 0.7rem 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: white;
+            text-decoration: none;
+            padding: 0.2rem 0.5rem;
+            border: 2px solid transparent;
+            border-radius: 3px;
+        }
+        .logo:hover { border-color: white; }
+        .logo span { color: var(--accent); }
+        .nav-right {
+            margin-left: auto;
+            display: flex;
+            gap: 0.5rem;
+        }
+        .nav-link {
+            color: white;
+            text-decoration: none;
+            font-size: 0.82rem;
+            padding: 0.3rem 0.7rem;
+            border: 2px solid transparent;
+            border-radius: 3px;
+        }
+        .nav-link:hover { border-color: white; }
+
+        .breadcrumb {
+            background: white;
+            padding: 0.6rem 1.5rem;
+            font-size: 0.78rem;
+            color: var(--muted);
+            border-bottom: 1px solid var(--border);
+        }
+        .breadcrumb a { color: var(--blue); text-decoration: none; }
+        .breadcrumb a:hover { text-decoration: underline; }
+
+        .main {
+            max-width: 1000px;
+            margin: 1.5rem auto;
+            padding: 0 1rem;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.2rem;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        .page-title { font-size: 1.6rem; font-weight: 700; }
+        .page-subtitle { font-size: 0.82rem; color: var(--muted); margin-top: 0.2rem; }
+
+        .filter-bar {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+        .filter-btn {
+            padding: 0.4rem 1rem;
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            background: white;
+            font-size: 0.8rem;
+            cursor: pointer;
+            color: var(--text);
+            font-family: inherit;
+            transition: all 0.2s;
+        }
+        .filter-btn:hover, .filter-btn.active {
+            background: var(--secondary);
+            color: white;
+            border-color: var(--secondary);
+        }
+
+        .order-card {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            box-shadow: var(--card-shadow);
+            overflow: hidden;
+        }
+        .order-header {
+            background: #f7f7f7;
+            padding: 0.8rem 1.2rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            border-bottom: 1px solid var(--border);
+            align-items: center;
+        }
+        .order-header-item { }
+        .oh-label {
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            color: var(--muted);
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.15rem;
+        }
+        .oh-value {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text);
+        }
+        .order-id-link {
+            color: var(--blue);
+            text-decoration: none;
+            font-size: 0.82rem;
+        }
+        .order-id-link:hover { text-decoration: underline; }
+
+        .status-badge {
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .s-pending { background: #fff8e1; color: #e65100; border: 1px solid #ffcc02; }
+        .s-processing { background: #e3f2fd; color: #1565c0; border: 1px solid #90caf9; }
+        .s-shipped { background: #e8f5e9; color: #2e7d32; border: 1px solid #a5d6a7; }
+        .s-delivered { background: #e8f5e9; color: #1b5e20; border: 1px solid #66bb6a; }
+
+        .order-body { padding: 1.2rem; }
+        .order-status-line {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+        .status-pending-text { color: #e65100; }
+        .status-processing-text { color: #1565c0; }
+        .status-shipped-text { color: #2e7d32; }
+        .status-delivered-text { color: #1b5e20; }
+
+        .order-items-grid {
+            display: flex;
+            gap: 0.8rem;
+            flex-wrap: wrap;
+            margin-bottom: 1rem;
+        }
+        .order-item-thumb {
+            width: 70px;
+            height: 70px;
+            object-fit: cover;
+            border-radius: 4px;
+            border: 1px solid var(--border);
+        }
+
+        .order-actions {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            padding-top: 0.8rem;
+            border-top: 1px solid #f5f5f5;
+        }
+        .action-btn {
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--blue);
+            border-radius: 4px;
+            background: white;
+            color: var(--blue);
+            font-size: 0.82rem;
+            cursor: pointer;
+            font-family: inherit;
+            transition: all 0.2s;
+        }
+        .action-btn:hover { background: var(--blue); color: white; }
+        .action-btn-primary {
+            padding: 0.5rem 1rem;
+            border: 1px solid #a88734;
+            border-radius: 4px;
+            background: linear-gradient(to bottom, #f7dfa5, #f0c14b);
+            color: var(--text);
+            font-size: 0.82rem;
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: 600;
+        }
+        .action-btn-primary:hover { background: linear-gradient(to bottom, #f0c14b, #e8ac0e); }
+
+        .empty-orders {
+            background: white;
+            border-radius: 8px;
+            padding: 4rem 2rem;
+            text-align: center;
+            box-shadow: var(--card-shadow);
+        }
+        .empty-orders .icon { font-size: 4rem; margin-bottom: 1rem; }
+        .empty-orders h2 { font-size: 1.3rem; margin-bottom: 0.5rem; }
+        .empty-orders p { color: var(--muted); margin-bottom: 1.5rem; font-size: 0.88rem; }
+        .shop-btn {
+            background: linear-gradient(to bottom, #f7dfa5, #f0c14b);
+            color: var(--text);
+            padding: 0.7rem 2rem;
+            border-radius: 4px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 0.9rem;
+            border: 1px solid #a88734;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 3rem;
+            color: var(--muted);
+        }
+
+        footer {
+            background: var(--secondary);
+            color: #888;
+            text-align: center;
+            padding: 1.5rem;
+            font-size: 0.78rem;
+            margin-top: 2rem;
+        }
+
+        @media (max-width: 600px) {
+            .order-header { gap: 0.8rem; }
+        }
+    </style>
+</head>
+<body>
+
+<nav>
+    <a href="index.html" class="logo">online<span>Bakala</span></a>
+    <div class="nav-right">
+        <a href="dashboard.html" class="nav-link">Shop</a>
+        <a href="cart.html" class="nav-link">Cart</a>
+        <a href="#" class="nav-link" onclick="logout()">Sign Out</a>
+    </div>
+</nav>
+
+<div class="breadcrumb">
+    <a href="index.html">onlineBakala</a> ›
+    <a href="dashboard.html">Your Account</a> › Your Orders
+</div>
+
+<div class="main">
+    <div class="page-header">
+        <div>
+            <div class="page-title">Your Orders</div>
+            <div class="page-subtitle" id="order-count"></div>
+        </div>
+        <a href="dashboard.html" style="color:var(--blue);text-decoration:none;font-size:0.85rem">
+            ← Continue Shopping
+        </a>
+    </div>
+
+    <div class="filter-bar">
+        <button class="filter-btn active" onclick="filterOrders('all',this)">All Orders</button>
+        <button class="filter-btn" onclick="filterOrders('pending',this)">Pending</button>
+        <button class="filter-btn" onclick="filterOrders('processing',this)">Processing</button>
+        <button class="filter-btn" onclick="filterOrders('shipped',this)">Shipped</button>
+        <button class="filter-btn" onclick="filterOrders('delivered',this)">Delivered</button>
+    </div>
+
+    <div id="orders-container">
+        <div class="loading">Loading your orders...</div>
+    </div>
+</div>
+
+<footer>
+    <p style="color:white;font-weight:700;margin-bottom:0.3rem">
+        online<span style="color:var(--accent)">Bakala</span>
+    </p>
+    <p>© 2026 onlineBakala.pk — All rights reserved</p>
+</footer>
+
+<script>
+const user = JSON.parse(localStorage.getItem('user') || 'null');
+if (!user) window.location.href = 'login.html';
+
+let allOrders = [];
+
+function formatPrice(p) { return 'PKR ' + parseFloat(p).toLocaleString('en-PK'); }
+
+function formatDate(d) {
+    return new Date(d).toLocaleDateString('en-PK', {
+        year: 'numeric', month: 'long', day: 'numeric'
+    });
+}
+
+function formatDateTime(d) {
+    return new Date(d).toLocaleString('en-PK', {
+        year: 'numeric', month: 'short', day: 'numeric',
+        hour: '2-digit', minute: '2-digit'
+    });
+}
+
+const statusConfig = {
+    pending: {
+        badge: 's-pending',
+        text: 'status-pending-text',
+        icon: '🕐',
+        label: 'Order Placed',
+        msg: 'Your order has been received and is being confirmed.'
+    },
+    processing: {
+        badge: 's-processing',
+        text: 'status-processing-text',
+        icon: '📦',
+        label: 'Processing',
+        msg: 'Your order is being prepared for shipment.'
+    },
+    shipped: {
+        badge: 's-shipped',
+        text: 'status-shipped-text',
+        icon: '🚚',
+        label: 'Shipped',
+        msg: 'Your order is on its way!'
+    },
+    delivered: {
+        badge: 's-delivered',
+        text: 'status-delivered-text',
+        icon: '✅',
+        label: 'Delivered',
+        msg: 'Your order has been delivered successfully.'
+    }
+};
+
+function getEstDelivery(createdAt) {
+    const d = new Date(createdAt);
+    d.setDate(d.getDate() + 5);
+    return d.toLocaleDateString('en-PK', {weekday:'long', month:'long', day:'numeric'});
+}
+
+function orderCardHtml(order) {
+    const sc = statusConfig[order.status] || statusConfig.pending;
+    const thumb = `https://picsum.photos/70/70?random=${order.id}`;
+
+    return `
+        <div class="order-card">
+            <div class="order-header">
+                <div class="order-header-item">
+                    <div class="oh-label">Order Placed</div>
+                    <div class="oh-value">${formatDate(order.created_at)}</div>
+                </div>
+                <div class="order-header-item">
+                    <div class="oh-label">Total</div>
+                    <div class="oh-value">${formatPrice(order.total)}</div>
+                </div>
+                <div class="order-header-item">
+                    <div class="oh-label">Ship To</div>
+                    <div class="oh-value">${user?.email?.split('@')[0] || 'Customer'}</div>
+                </div>
+                <div class="order-header-item" style="margin-left:auto">
+                    <div class="oh-label">Order # ${order.id}</div>
+                    <div>
+                        <a href="#" class="order-id-link">View order details</a> |
+                        <a href="#" class="order-id-link">Invoice</a>
+                    </div>
+                </div>
+                <span class="status-badge ${sc.badge}">${sc.label}</span>
+            </div>
+            <div class="order-body">
+                <div class="order-status-line ${sc.text}">
+                    ${sc.icon} ${sc.msg}
+                </div>
+                ${order.status !== 'delivered' ? `
+                <div style="font-size:0.82rem;color:var(--muted);margin-bottom:1rem">
+                    Estimated delivery: <strong>${getEstDelivery(order.created_at)}</strong>
+                </div>` : ''}
+                <div class="order-items-grid">
+                    ${Array.from({length: Math.min(order.item_count || 1, 4)}).map((_,i) => `
+                        <img class="order-item-thumb"
+                             src="https://picsum.photos/70/70?random=${order.id * 10 + i}"
+                             alt="Product"
+                             onerror="this.src='https://via.placeholder.com/70'">
+                    `).join('')}
+                    ${(order.item_count || 1) > 4 ?
+                        `<div style="width:70px;height:70px;background:#f5f5f5;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:0.82rem;color:var(--muted);border:1px solid var(--border)">
+                            +${order.item_count - 4} more
+                        </div>` : ''}
+                </div>
+                <div class="order-actions">
+                    ${order.status === 'delivered' ?
+                        `<button class="action-btn-primary" onclick="buyAgain(${order.id})">Buy Again</button>
+                         <button class="action-btn">Write a Review</button>` :
+                        `<button class="action-btn">Track Package</button>
+                         <button class="action-btn">Cancel Order</button>`
+                    }
+                    <button class="action-btn">Contact Seller</button>
+                    <button class="action-btn">Return Items</button>
+                </div>
+            </div>
+        </div>`;
+}
+
+function render(orders) {
+    const container = document.getElementById('orders-container');
+    document.getElementById('order-count').textContent =
+        orders.length + ' order' + (orders.length !== 1 ? 's' : '');
+
+    if (!orders.length) {
+        container.innerHTML = `
+            <div class="empty-orders">
+                <div class="icon">📦</div>
+                <h2>No orders found</h2>
+                <p>You haven't placed any orders yet.<br>Start shopping to see your orders here.</p>
+                <a href="dashboard.html" class="shop-btn">Start Shopping</a>
+            </div>`;
+        return;
+    }
+    container.innerHTML = orders.map(orderCardHtml).join('');
+}
+
+function filterOrders(status, btn) {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    if (status === 'all') { render(allOrders); return; }
+    render(allOrders.filter(o => o.status === status));
+}
+
+function buyAgain(orderId) {
+    window.location.href = 'dashboard.html';
+}
+
+async function logout() {
+    await fetch('/api/auth/logout', {method:'POST', credentials:'include'});
+    localStorage.removeItem('user');
+    window.location.href = 'login.html';
+}
+
+async function loadOrders() {
+    try {
+        const res = await fetch('/api/orders', {credentials:'include'});
+        allOrders = await res.json();
+        render(allOrders);
+    } catch {
+        document.getElementById('orders-container').innerHTML =
+            '<div class="loading">Failed to load orders. Please refresh.</div>';
+    }
+}
+
+loadOrders();
+</script>
+</body>
+</html>

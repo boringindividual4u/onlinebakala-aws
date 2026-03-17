@@ -1,0 +1,994 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>onlineBakala - Pakistan ka Apna Store</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #131921;
+            --secondary: #232f3e;
+            --accent: #febd69;
+            --accent-dark: #f3a847;
+            --blue: #007185;
+            --blue-dark: #005f6b;
+            --red: #B12704;
+            --green: #007600;
+            --bg: #eaeded;
+            --white: #ffffff;
+            --text: #0F1111;
+            --muted: #565959;
+            --border: #DDD;
+            --card-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', Arial, sans-serif; background: var(--bg); color: var(--text); }
+
+        /* TOP BAR */
+        .topbar {
+            background: var(--primary);
+            color: white;
+            font-size: 0.78rem;
+            padding: 0.35rem 1rem;
+            display: flex;
+            justify-content: flex-end;
+            gap: 1.5rem;
+            align-items: center;
+        }
+        .topbar a { color: #ccc; text-decoration: none; }
+        .topbar a:hover { color: var(--accent); }
+
+        /* NAVBAR */
+        nav {
+            background: var(--secondary);
+            padding: 0.7rem 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            position: sticky;
+            top: 0;
+            z-index: 200;
+        }
+        .logo {
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: white;
+            text-decoration: none;
+            white-space: nowrap;
+            padding: 0.2rem 0.5rem;
+            border: 2px solid transparent;
+            border-radius: 3px;
+        }
+        .logo:hover { border-color: white; }
+        .logo span { color: var(--accent); }
+
+        .nav-location {
+            color: #ccc;
+            font-size: 0.75rem;
+            white-space: nowrap;
+            display: flex;
+            flex-direction: column;
+            cursor: pointer;
+            padding: 0.2rem 0.5rem;
+            border: 2px solid transparent;
+            border-radius: 3px;
+        }
+        .nav-location:hover { border-color: white; }
+        .nav-location span:first-child { font-size: 0.65rem; }
+        .nav-location span:last-child { color: white; font-weight: 600; font-size: 0.85rem; }
+
+        .nav-search {
+            flex: 1;
+            display: flex;
+            max-width: 700px;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .search-category {
+            background: #f3f3f3;
+            border: none;
+            padding: 0 0.8rem;
+            font-size: 0.8rem;
+            color: var(--text);
+            cursor: pointer;
+            border-right: 1px solid #ccc;
+        }
+        .nav-search input {
+            flex: 1;
+            padding: 0.6rem 0.8rem;
+            border: none;
+            font-size: 0.95rem;
+            outline: none;
+        }
+        .nav-search button {
+            padding: 0 1rem;
+            background: var(--accent);
+            border: none;
+            cursor: pointer;
+            font-size: 1.1rem;
+            transition: background 0.2s;
+        }
+        .nav-search button:hover { background: var(--accent-dark); }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            margin-left: auto;
+        }
+        .nav-btn {
+            color: white;
+            text-decoration: none;
+            font-size: 0.8rem;
+            padding: 0.3rem 0.6rem;
+            border: 2px solid transparent;
+            border-radius: 3px;
+            display: flex;
+            flex-direction: column;
+            white-space: nowrap;
+        }
+        .nav-btn:hover { border-color: white; }
+        .nav-btn span:first-child { font-size: 0.65rem; color: #ccc; }
+        .nav-btn span:last-child { font-weight: 700; font-size: 0.88rem; }
+        .cart-btn {
+            color: white;
+            text-decoration: none;
+            font-size: 0.88rem;
+            font-weight: 700;
+            padding: 0.3rem 0.6rem;
+            border: 2px solid transparent;
+            border-radius: 3px;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+        .cart-btn:hover { border-color: white; }
+        .cart-count {
+            background: var(--accent);
+            color: var(--primary);
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            font-size: 0.7rem;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* SUB NAV */
+        .subnav {
+            background: var(--primary);
+            padding: 0.4rem 1rem;
+            display: flex;
+            gap: 0.3rem;
+            overflow-x: auto;
+        }
+        .subnav a {
+            color: white;
+            text-decoration: none;
+            font-size: 0.82rem;
+            padding: 0.3rem 0.7rem;
+            white-space: nowrap;
+            border: 1px solid transparent;
+            border-radius: 3px;
+        }
+        .subnav a:hover { border-color: white; }
+        .subnav a.active {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        /* HERO CAROUSEL */
+        .hero {
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(135deg, #1a252f 0%, #2d4356 50%, #1a3a4a 100%);
+        }
+        .hero-slide {
+            padding: 3rem 2rem 5rem;
+            text-align: center;
+            color: white;
+        }
+        .hero-slide h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 0.8rem;
+            line-height: 1.1;
+        }
+        .hero-slide h1 span { color: var(--accent); }
+        .hero-slide p {
+            font-size: 1.1rem;
+            color: #b0c4d8;
+            margin-bottom: 2rem;
+        }
+        .hero-btns {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .btn-yellow {
+            background: var(--accent);
+            color: var(--primary);
+            padding: 0.8rem 2rem;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 0.95rem;
+            transition: background 0.2s;
+            border: none;
+            cursor: pointer;
+        }
+        .btn-yellow:hover { background: var(--accent-dark); }
+        .btn-outline {
+            background: transparent;
+            color: white;
+            padding: 0.8rem 2rem;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.95rem;
+            border: 2px solid white;
+            transition: all 0.2s;
+        }
+        .btn-outline:hover { background: white; color: var(--primary); }
+        .hero-fade {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 80px;
+            background: linear-gradient(to bottom, transparent, var(--bg));
+        }
+
+        /* DEAL BANNER */
+        .deal-banner {
+            background: white;
+            margin: 0 1rem;
+            border-radius: 8px;
+            padding: 0.6rem 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-top: -2rem;
+            position: relative;
+            z-index: 10;
+            box-shadow: var(--card-shadow);
+            flex-wrap: wrap;
+        }
+        .deal-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.82rem;
+            color: var(--text);
+            padding: 0.3rem 0.8rem;
+            border-right: 1px solid var(--border);
+        }
+        .deal-item:last-child { border-right: none; }
+        .deal-item span:first-child { font-size: 1.2rem; }
+
+        /* MAIN */
+        .main { max-width: 1300px; margin: 1.5rem auto; padding: 0 1rem; }
+
+        /* CATEGORY CARDS */
+        .category-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 0.8rem;
+            margin-bottom: 2rem;
+        }
+        .cat-card {
+            background: white;
+            border-radius: 8px;
+            padding: 1rem 0.8rem;
+            text-align: center;
+            text-decoration: none;
+            color: var(--text);
+            box-shadow: var(--card-shadow);
+            transition: transform 0.2s, box-shadow 0.2s;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+        .cat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            border-color: var(--accent);
+        }
+        .cat-card.active { border-color: var(--blue); }
+        .cat-icon { font-size: 2rem; margin-bottom: 0.4rem; }
+        .cat-name { font-size: 0.78rem; font-weight: 600; color: var(--text); }
+
+        /* SECTION */
+        .section {
+            background: white;
+            border-radius: 8px;
+            padding: 1.2rem;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--card-shadow);
+        }
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text);
+        }
+        .see-all {
+            color: var(--blue);
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+        .see-all:hover { color: var(--blue-dark); text-decoration: underline; }
+
+        /* PRODUCT GRID */
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+            gap: 1rem;
+        }
+        .product-card {
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            overflow: hidden;
+            transition: box-shadow 0.2s, transform 0.2s;
+            cursor: pointer;
+            background: white;
+            position: relative;
+        }
+        .product-card:hover {
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+            transform: translateY(-2px);
+        }
+        .badge {
+            position: absolute;
+            top: 0.6rem;
+            left: 0.6rem;
+            padding: 0.2rem 0.5rem;
+            border-radius: 3px;
+            font-size: 0.65rem;
+            font-weight: 700;
+            z-index: 1;
+            text-transform: uppercase;
+        }
+        .badge-bestseller { background: #ff6b35; color: white; }
+        .badge-new { background: var(--blue); color: white; }
+        .badge-sale { background: var(--red); color: white; }
+        .product-img-wrap {
+            width: 100%;
+            height: 180px;
+            overflow: hidden;
+            background: #f9f9f9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .product-img-wrap img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s;
+        }
+        .product-card:hover .product-img-wrap img { transform: scale(1.05); }
+        .product-body { padding: 0.8rem; }
+        .product-brand {
+            font-size: 0.7rem;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.2rem;
+        }
+        .product-name {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 0.3rem;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            line-height: 1.3;
+        }
+        .stars {
+            color: #FFA41C;
+            font-size: 0.75rem;
+            margin-bottom: 0.3rem;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+        .stars span { color: var(--blue); font-size: 0.7rem; }
+        .product-price {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--red);
+            margin-bottom: 0.2rem;
+        }
+        .product-orig {
+            font-size: 0.75rem;
+            color: var(--muted);
+            text-decoration: line-through;
+        }
+        .product-stock-ok { font-size: 0.72rem; color: var(--green); margin-bottom: 0.5rem; }
+        .product-stock-low { font-size: 0.72rem; color: var(--red); margin-bottom: 0.5rem; }
+        .add-btn {
+            width: 100%;
+            padding: 0.45rem;
+            background: var(--accent);
+            color: var(--primary);
+            border: 1px solid var(--accent-dark);
+            border-radius: 20px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .add-btn:hover { background: var(--accent-dark); }
+        .signin-btn {
+            width: 100%;
+            padding: 0.45rem;
+            background: var(--accent);
+            color: var(--primary);
+            border: 1px solid var(--accent-dark);
+            border-radius: 20px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-align: center;
+            text-decoration: none;
+            display: block;
+        }
+        .signin-btn:hover { background: var(--accent-dark); }
+
+        /* TOAST */
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: var(--primary);
+            color: white;
+            padding: 0.8rem 1.5rem;
+            border-radius: 25px;
+            font-size: 0.88rem;
+            transition: transform 0.3s;
+            z-index: 1000;
+            white-space: nowrap;
+        }
+        .toast.show { transform: translateX(-50%) translateY(0); }
+
+        /* PROMO STRIP */
+        .promo-strip {
+            background: linear-gradient(135deg, var(--secondary), var(--primary));
+            border-radius: 8px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        .promo-strip h2 { color: white; font-size: 1.4rem; }
+        .promo-strip p { color: #aaa; font-size: 0.9rem; margin-top: 0.3rem; }
+        .promo-features {
+            display: flex;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+        }
+        .promo-feat {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            color: #ccc;
+            font-size: 0.82rem;
+        }
+
+        /* FOOTER */
+        .footer-top {
+            background: #37475a;
+            color: white;
+            padding: 2rem 1rem;
+            margin-top: 2rem;
+            cursor: pointer;
+            text-align: center;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+        .footer-top:hover { background: #485769; }
+        .footer-main {
+            background: var(--secondary);
+            color: #ddd;
+            padding: 2rem 1rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 1.5rem;
+        }
+        .footer-col h4 {
+            color: white;
+            font-size: 0.9rem;
+            margin-bottom: 0.8rem;
+        }
+        .footer-col a {
+            display: block;
+            color: #aaa;
+            text-decoration: none;
+            font-size: 0.8rem;
+            margin-bottom: 0.4rem;
+        }
+        .footer-col a:hover { color: var(--accent); text-decoration: underline; }
+        .footer-bottom {
+            background: var(--primary);
+            color: #888;
+            text-align: center;
+            padding: 1rem;
+            font-size: 0.75rem;
+        }
+        .footer-logo {
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: white;
+            margin-bottom: 0.5rem;
+        }
+        .footer-logo span { color: var(--accent); }
+
+        /* SEARCH RESULTS */
+        #search-results {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 0 0 4px 4px;
+            z-index: 300;
+            max-height: 300px;
+            overflow-y: auto;
+            display: none;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        .search-result-item {
+            padding: 0.6rem 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            cursor: pointer;
+            font-size: 0.85rem;
+            border-bottom: 1px solid #f5f5f5;
+        }
+        .search-result-item:hover { background: #f5f5f5; }
+        .search-result-item img {
+            width: 35px;
+            height: 35px;
+            object-fit: cover;
+            border-radius: 3px;
+        }
+        .search-wrapper { position: relative; flex: 1; display: flex; max-width: 700px; }
+
+        @media (max-width: 768px) {
+            .hero-slide h1 { font-size: 1.6rem; }
+            .products-grid { grid-template-columns: repeat(2, 1fr); }
+            .category-grid { grid-template-columns: repeat(3, 1fr); }
+            .nav-location { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+    <a href="#">Sell on onlineBakala</a>
+    <a href="#">Help</a>
+    <a href="login.html">Sign In</a>
+    <a href="signup.html">Create Account</a>
+</div>
+
+<!-- NAVBAR -->
+<nav>
+    <a href="index.html" class="logo">online<span>Bakala</span></a>
+
+    <div class="nav-location">
+        <span>Deliver to</span>
+        <span>📍 Pakistan</span>
+    </div>
+
+    <div class="search-wrapper">
+        <div class="nav-search" style="flex:1">
+            <select class="search-category" id="search-cat">
+                <option>All</option>
+                <option>Beauty</option>
+                <option>Electronics</option>
+                <option>Fashion</option>
+                <option>Baby</option>
+            </select>
+            <input type="text" id="search-input"
+                   placeholder="Search onlineBakala.pk"
+                   oninput="handleSearch(this.value)"
+                   onblur="setTimeout(()=>hideSearch(),200)"
+                   autocomplete="off">
+            <button onclick="doSearch()">🔍</button>
+        </div>
+        <div id="search-results"></div>
+    </div>
+
+    <div class="nav-right">
+        <a href="login.html" class="nav-btn">
+            <span>Hello, Sign in</span>
+            <span>Account & Lists ▾</span>
+        </a>
+        <a href="orders.html" class="nav-btn">
+            <span>Returns</span>
+            <span>& Orders</span>
+        </a>
+        <a href="cart.html" class="cart-btn">
+            🛒 Cart
+            <div class="cart-count" id="cart-count">0</div>
+        </a>
+    </div>
+</nav>
+
+<!-- SUB NAV -->
+<div class="subnav">
+    <a href="#" onclick="filterCat('all')" class="active" id="cat-all">☰ All Categories</a>
+    <a href="#" onclick="filterCat('beauty')" id="cat-beauty">💄 Beauty & Skincare</a>
+    <a href="#" onclick="filterCat('electronics')" id="cat-electronics">📱 Electronics</a>
+    <a href="#" onclick="filterCat('fashion')" id="cat-fashion">👗 Fashion</a>
+    <a href="#" onclick="filterCat('baby')" id="cat-baby">👶 Baby & Kids</a>
+    <a href="signup.html">🔥 Today's Deals</a>
+    <a href="signup.html">⭐ Best Sellers</a>
+</div>
+
+<!-- HERO -->
+<div class="hero">
+    <div class="hero-slide">
+        <h1>Pakistan ka Apna<br><span>Online Store</span></h1>
+        <p>Top brands • Best prices • Free delivery nationwide</p>
+        <div class="hero-btns">
+            <a href="signup.html" class="btn-yellow">Shop Now →</a>
+            <a href="#products" class="btn-outline">Browse Products</a>
+        </div>
+    </div>
+    <div class="hero-fade"></div>
+</div>
+
+<!-- DEAL BANNER -->
+<div class="deal-banner">
+    <div class="deal-item"><span>🚚</span><span>Free Delivery on orders over PKR 2,000</span></div>
+    <div class="deal-item"><span>🔒</span><span>100% Secure Payments</span></div>
+    <div class="deal-item"><span>↩️</span><span>Easy 30-Day Returns</span></div>
+    <div class="deal-item"><span>⭐</span><span>Genuine Products Only</span></div>
+    <div class="deal-item"><span>📞</span><span>24/7 Customer Support</span></div>
+</div>
+
+<!-- MAIN -->
+<div class="main" id="products">
+
+    <!-- CATEGORIES -->
+    <div class="section" style="margin-top:1.5rem">
+        <div class="section-title" style="margin-bottom:1rem">Shop by Category</div>
+        <div class="category-grid">
+            <div class="cat-card" onclick="filterCat('all')" id="cc-all">
+                <div class="cat-icon">🏪</div>
+                <div class="cat-name">All Products</div>
+            </div>
+            <div class="cat-card" onclick="filterCat('beauty')" id="cc-beauty">
+                <div class="cat-icon">💄</div>
+                <div class="cat-name">Beauty & Skincare</div>
+            </div>
+            <div class="cat-card" onclick="filterCat('electronics')" id="cc-electronics">
+                <div class="cat-icon">📱</div>
+                <div class="cat-name">Electronics</div>
+            </div>
+            <div class="cat-card" onclick="filterCat('fashion')" id="cc-fashion">
+                <div class="cat-icon">👗</div>
+                <div class="cat-name">Women's Fashion</div>
+            </div>
+            <div class="cat-card" onclick="filterCat('baby')" id="cc-baby">
+                <div class="cat-icon">👶</div>
+                <div class="cat-name">Baby & Kids</div>
+            </div>
+            <div class="cat-card" onclick="filterCat('stationery')" id="cc-stationery">
+                <div class="cat-icon">✏️</div>
+                <div class="cat-name">Stationery</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- BEST SELLERS -->
+    <div class="section">
+        <div class="section-header">
+            <div class="section-title">🔥 Best Sellers</div>
+            <a href="signup.html" class="see-all">See all best sellers →</a>
+        </div>
+        <div class="products-grid" id="bestsellers-grid">
+            <div style="padding:2rem;color:var(--muted);text-align:center;grid-column:1/-1">Loading...</div>
+        </div>
+    </div>
+
+    <!-- PROMO STRIP -->
+    <div class="promo-strip">
+        <div>
+            <h2>Shop smarter. Save more.</h2>
+            <p>Create a free account and unlock exclusive member deals</p>
+        </div>
+        <div class="promo-features">
+            <div class="promo-feat"><span>🎁</span><span>Member-only deals</span></div>
+            <div class="promo-feat"><span>📦</span><span>Order tracking</span></div>
+            <div class="promo-feat"><span>💳</span><span>JazzCash & Easypaisa</span></div>
+        </div>
+        <a href="signup.html" class="btn-yellow">Join Free →</a>
+    </div>
+
+    <!-- ALL PRODUCTS -->
+    <div class="section">
+        <div class="section-header">
+            <div class="section-title" id="products-title">All Products</div>
+            <span id="product-count" style="color:var(--muted);font-size:0.82rem"></span>
+        </div>
+        <div class="products-grid" id="all-products-grid">
+            <div style="padding:2rem;color:var(--muted);text-align:center;grid-column:1/-1">Loading products...</div>
+        </div>
+    </div>
+
+    <!-- SIGN UP CTA -->
+    <div style="background:white;border-radius:8px;padding:2.5rem;text-align:center;box-shadow:var(--card-shadow);margin-bottom:1.5rem">
+        <h2 style="font-size:1.6rem;margin-bottom:0.5rem">Ready to shop? 🛍️</h2>
+        <p style="color:var(--muted);margin-bottom:1.5rem">Create a free account to add items to cart and place orders</p>
+        <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
+            <a href="signup.html" class="btn-yellow" style="padding:0.8rem 2.5rem">Create Free Account</a>
+            <a href="login.html" style="padding:0.8rem 2.5rem;border:2px solid var(--secondary);border-radius:25px;text-decoration:none;color:var(--text);font-weight:600">Sign In</a>
+        </div>
+    </div>
+</div>
+
+<!-- FOOTER -->
+<div class="footer-top" onclick="window.scrollTo({top:0,behavior:'smooth'})">
+    ↑ Back to top
+</div>
+<div class="footer-main">
+    <div class="footer-col">
+        <div class="footer-logo">online<span>Bakala</span></div>
+        <p style="font-size:0.78rem;color:#888;margin-top:0.5rem">Pakistan's trusted online store. Quality products, best prices.</p>
+    </div>
+    <div class="footer-col">
+        <h4>Get to Know Us</h4>
+        <a href="#">About onlineBakala</a>
+        <a href="#">Careers</a>
+        <a href="#">Press Releases</a>
+        <a href="#">onlineBakala Science</a>
+    </div>
+    <div class="footer-col">
+        <h4>Make Money with Us</h4>
+        <a href="#">Sell on onlineBakala</a>
+        <a href="#">Become an Affiliate</a>
+        <a href="#">Advertise Your Products</a>
+    </div>
+    <div class="footer-col">
+        <h4>Payment Methods</h4>
+        <a href="#">JazzCash</a>
+        <a href="#">Easypaisa</a>
+        <a href="#">Credit/Debit Card</a>
+        <a href="#">Cash on Delivery</a>
+    </div>
+    <div class="footer-col">
+        <h4>Let Us Help You</h4>
+        <a href="#">Your Account</a>
+        <a href="#">Your Orders</a>
+        <a href="#">Shipping Rates</a>
+        <a href="#">Returns Policy</a>
+        <a href="#">Help</a>
+    </div>
+</div>
+<div class="footer-bottom">
+    <p>© 2026 onlineBakala.pk — All rights reserved</p>
+    <p style="margin-top:0.3rem">
+        <a href="#" style="color:#888;text-decoration:none;margin:0 0.5rem">Privacy Notice</a>
+        <a href="#" style="color:#888;text-decoration:none;margin:0 0.5rem">Conditions of Use</a>
+        <a href="#" style="color:#888;text-decoration:none;margin:0 0.5rem">Interest-Based Ads</a>
+    </p>
+    <p style="margin-top:0.5rem;color:#555;font-size:0.7rem">Built on AWS · EC2 · RDS · ALB · CloudFront · Route 53</p>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+let allProducts = [];
+
+const brands = {
+    1: "POND'S", 2: "Crayola", 3: "Levi's",
+    4: "Apple", 5: "Samsung", 6: "Pampers",
+    7: "L'Oréal Paris", 8: "Zara", 9: "Neutrogena", 10: "Apple"
+};
+const ratings = [4.5, 4.2, 4.6, 4.8, 4.4, 4.7, 4.3, 4.1, 4.6, 4.9];
+const reviews = [2341, 856, 1203, 445, 987, 3102, 678, 334, 892, 1567];
+const badges = {1:'bestseller', 3:'bestseller', 4:'bestseller', 5:'new', 7:'bestseller', 10:'new'};
+const badgeLabels = {bestseller:'Best Seller', new:'New Arrival', sale:'Sale'};
+
+const categoryMap = {
+    beauty: [1, 7, 9],
+    electronics: [4, 5, 10],
+    fashion: [3, 8],
+    baby: [6],
+    stationery: [2]
+};
+
+function formatPrice(p) {
+    return 'PKR ' + parseFloat(p).toLocaleString('en-PK');
+}
+
+function getOrigPrice(p) {
+    return formatPrice(parseFloat(p) * 1.15);
+}
+
+function starsHtml(rating) {
+    const full = Math.floor(rating);
+    const half = rating % 1 >= 0.5 ? 1 : 0;
+    return '★'.repeat(full) + (half ? '½' : '') + '☆'.repeat(5 - full - half);
+}
+
+function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+async function loadProducts() {
+    try {
+        const res = await fetch('/api/products');
+        allProducts = await res.json();
+        renderBestSellers();
+        renderProducts(allProducts);
+        document.getElementById('product-count').textContent =
+            allProducts.length + ' products';
+    } catch {
+        document.getElementById('all-products-grid').innerHTML =
+            '<div style="grid-column:1/-1;text-align:center;padding:2rem;color:var(--muted)">Failed to load. Please refresh.</div>';
+    }
+}
+
+function productCardHtml(p, showSignin = false) {
+    const badge = badges[p.id];
+    const stockText = p.stock > 5
+        ? '<div class="product-stock-ok">✓ In Stock</div>'
+        : p.stock > 0
+        ? `<div class="product-stock-low">Only ${p.stock} left!</div>`
+        : '<div class="product-stock-low">Out of Stock</div>';
+
+    const btn = showSignin
+        ? `<a href="signup.html" class="signin-btn">Sign in to Buy</a>`
+        : `<button class="add-btn" onclick="addToCart(${p.id},this)" ${p.stock===0?'disabled':''}>Add to Cart</button>`;
+
+    return `
+        <div class="product-card" onclick="window.location.href='${showSignin?'signup':'dashboard'}.html'">
+            ${badge ? `<div class="badge badge-${badge}">${badgeLabels[badge]}</div>` : ''}
+            <div class="product-img-wrap">
+                <img src="${p.image_url}" alt="${p.name}"
+                     onerror="this.src='https://via.placeholder.com/400x400?text=Product'">
+            </div>
+            <div class="product-body">
+                <div class="product-brand">${brands[p.id] || 'onlineBakala'}</div>
+                <div class="product-name">${p.name}</div>
+                <div class="stars">${starsHtml(ratings[p.id-1]||4.5)}
+                    <span>(${reviews[p.id-1]||500})</span>
+                </div>
+                <div class="product-price">${formatPrice(p.price)}</div>
+                <div class="product-orig">${getOrigPrice(p.price)}</div>
+                ${stockText}
+                ${btn}
+            </div>
+        </div>`;
+}
+
+function renderBestSellers() {
+    const best = allProducts.filter(p => [1,4,7,10].includes(p.id));
+    document.getElementById('bestsellers-grid').innerHTML =
+        best.map(p => productCardHtml(p, true)).join('');
+}
+
+function renderProducts(products) {
+    const grid = document.getElementById('all-products-grid');
+    document.getElementById('product-count').textContent = products.length + ' products';
+    if (!products.length) {
+        grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:2rem;color:var(--muted)">No products found.</div>';
+        return;
+    }
+    grid.innerHTML = products.map(p => productCardHtml(p, true)).join('');
+}
+
+function filterCat(cat) {
+    document.querySelectorAll('.subnav a, .cat-card').forEach(el => el.classList.remove('active'));
+    const navEl = document.getElementById('cat-' + cat);
+    const ccEl = document.getElementById('cc-' + cat);
+    if (navEl) navEl.classList.add('active');
+    if (ccEl) ccEl.classList.add('active');
+
+    if (cat === 'all') {
+        renderProducts(allProducts);
+        document.getElementById('products-title').textContent = 'All Products';
+        return;
+    }
+
+    const ids = categoryMap[cat] || [];
+    const filtered = allProducts.filter(p => ids.includes(p.id));
+    document.getElementById('products-title').textContent =
+        cat.charAt(0).toUpperCase() + cat.slice(1);
+    renderProducts(filtered.length ? filtered : allProducts);
+}
+
+function handleSearch(val) {
+    const box = document.getElementById('search-results');
+    if (!val.trim()) { box.style.display = 'none'; return; }
+    const results = allProducts.filter(p =>
+        p.name.toLowerCase().includes(val.toLowerCase()) ||
+        p.description.toLowerCase().includes(val.toLowerCase())
+    ).slice(0, 6);
+    if (!results.length) { box.style.display = 'none'; return; }
+    box.innerHTML = results.map(p => `
+        <div class="search-result-item" onclick="window.location.href='signup.html'">
+            <img src="${p.image_url}" alt="${p.name}"
+                 onerror="this.src='https://via.placeholder.com/35'">
+            <div>
+                <div style="font-weight:600">${p.name}</div>
+                <div style="color:var(--red);font-size:0.78rem">${formatPrice(p.price)}</div>
+            </div>
+        </div>`).join('');
+    box.style.display = 'block';
+}
+
+function hideSearch() {
+    document.getElementById('search-results').style.display = 'none';
+}
+
+function doSearch() {
+    const val = document.getElementById('search-input').value;
+    if (val) handleSearch(val);
+}
+
+async function addToCart(id, btn) {
+    btn.disabled = true;
+    btn.textContent = 'Adding...';
+    try {
+        const res = await fetch('/api/cart', {
+            method: 'POST',
+            headers: {'Content-Type':'application/json'},
+            body: JSON.stringify({product_id: id, quantity: 1}),
+            credentials: 'include'
+        });
+        if (res.ok) {
+            showToast('Added to cart!');
+            btn.textContent = 'Added ✓';
+            loadCartCount();
+            setTimeout(() => { btn.textContent = 'Add to Cart'; btn.disabled = false; }, 2000);
+        } else {
+            const d = await res.json();
+            if (res.status === 401) window.location.href = 'login.html';
+            else { showToast(d.error || 'Failed'); btn.textContent = 'Add to Cart'; btn.disabled = false; }
+        }
+    } catch { showToast('Error'); btn.textContent = 'Add to Cart'; btn.disabled = false; }
+}
+
+async function loadCartCount() {
+    try {
+        const res = await fetch('/api/cart', {credentials:'include'});
+        if (res.ok) {
+            const items = await res.json();
+            document.getElementById('cart-count').textContent =
+                Array.isArray(items) ? items.reduce((s,i) => s + i.quantity, 0) : 0;
+        }
+    } catch {}
+}
+
+loadProducts();
+loadCartCount();
+</script>
+</body>
+</html>

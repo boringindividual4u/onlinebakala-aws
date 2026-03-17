@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Account - onlineBakala</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #131921;
+            --secondary: #232f3e;
+            --accent: #febd69;
+            --accent-dark: #f3a847;
+            --blue: #007185;
+            --red: #B12704;
+            --green: #007600;
+            --text: #0F1111;
+            --muted: #565959;
+            --border: #DDD;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', Arial, sans-serif;
+            background: #f3f3f3;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        header {
+            background: var(--primary);
+            padding: 1rem;
+            text-align: center;
+            border-bottom: 1px solid #3a4553;
+        }
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: white;
+            text-decoration: none;
+        }
+        .logo span { color: var(--accent); }
+
+        .page {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem 1rem;
+        }
+
+        .card {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 2rem;
+            width: 100%;
+            max-width: 400px;
+        }
+        .card h1 {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 0.3rem;
+        }
+        .card .subtitle {
+            font-size: 0.82rem;
+            color: var(--muted);
+            margin-bottom: 1.2rem;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.8rem;
+        }
+        .form-group { margin-bottom: 0.85rem; }
+        label {
+            display: block;
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 0.3rem;
+        }
+        input, select {
+            width: 100%;
+            padding: 0.6rem 0.8rem;
+            border: 1px solid #a6a6a6;
+            border-radius: 4px;
+            font-size: 0.88rem;
+            outline: none;
+            font-family: inherit;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            background: white;
+        }
+        input:focus, select:focus {
+            border-color: #e77600;
+            box-shadow: 0 0 0 3px rgba(231,118,0,0.2);
+        }
+        input.err { border-color: var(--red); }
+
+        .field-error {
+            font-size: 0.72rem;
+            color: var(--red);
+            margin-top: 0.2rem;
+            display: none;
+        }
+
+        .pwd-strength {
+            margin-top: 0.3rem;
+            display: none;
+        }
+        .strength-bar {
+            height: 4px;
+            border-radius: 2px;
+            background: #eee;
+            margin-bottom: 0.2rem;
+            overflow: hidden;
+        }
+        .strength-fill {
+            height: 100%;
+            border-radius: 2px;
+            transition: width 0.3s, background 0.3s;
+            width: 0%;
+        }
+        .strength-text { font-size: 0.7rem; }
+
+        .show-pwd {
+            font-size: 0.75rem;
+            color: var(--blue);
+            cursor: pointer;
+            float: right;
+        }
+        .show-pwd:hover { text-decoration: underline; }
+
+        .phone-wrapper {
+            display: flex;
+            gap: 0.5rem;
+        }
+        .phone-prefix {
+            padding: 0.6rem 0.5rem;
+            border: 1px solid #a6a6a6;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            background: #f9f9f9;
+            color: var(--text);
+            white-space: nowrap;
+            font-family: inherit;
+        }
+
+        .error-box {
+            background: #fff3f3;
+            border: 1px solid #df3312;
+            border-left: 4px solid #df3312;
+            border-radius: 4px;
+            padding: 0.7rem 0.9rem;
+            font-size: 0.82rem;
+            color: #df3312;
+            margin-bottom: 1rem;
+            display: none;
+        }
+        .success-box {
+            background: #f0fff4;
+            border: 1px solid #27ae60;
+            border-left: 4px solid #27ae60;
+            border-radius: 4px;
+            padding: 0.7rem 0.9rem;
+            font-size: 0.82rem;
+            color: #27ae60;
+            margin-bottom: 1rem;
+            display: none;
+        }
+
+        .btn-create {
+            width: 100%;
+            padding: 0.7rem;
+            background: linear-gradient(to bottom, #f7dfa5, #f0c14b);
+            color: var(--text);
+            border: 1px solid #a88734;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 0.5rem;
+            font-family: inherit;
+            transition: background 0.2s;
+        }
+        .btn-create:hover {
+            background: linear-gradient(to bottom, #f0c14b, #e8ac0e);
+        }
+        .btn-create:disabled { background: #ddd; cursor: not-allowed; border-color: #ccc; }
+
+        .terms {
+            font-size: 0.74rem;
+            color: var(--muted);
+            text-align: center;
+            margin-top: 0.8rem;
+            line-height: 1.5;
+        }
+        .terms a { color: var(--blue); text-decoration: none; }
+        .terms a:hover { text-decoration: underline; }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            margin: 1.2rem 0;
+        }
+        .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+        .divider span { font-size: 0.78rem; color: var(--muted); }
+
+        .btn-signin {
+            width: 100%;
+            padding: 0.6rem;
+            background: linear-gradient(to bottom, #f7f8fa, #e7e9ec);
+            color: var(--text);
+            border: 1px solid #adb1b8;
+            border-radius: 4px;
+            font-size: 0.88rem;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: inherit;
+            text-align: center;
+            text-decoration: none;
+            display: block;
+        }
+        .btn-signin:hover { background: linear-gradient(to bottom, #e7e9ec, #d9dce1); }
+
+        footer {
+            background: #f3f3f3;
+            border-top: 1px solid var(--border);
+            padding: 1.5rem 1rem;
+            text-align: center;
+        }
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+            margin-bottom: 0.8rem;
+        }
+        .footer-links a { font-size: 0.75rem; color: var(--blue); text-decoration: none; }
+        .footer-links a:hover { text-decoration: underline; }
+        .footer-copy { font-size: 0.72rem; color: var(--muted); }
+        .footer-logo { font-size: 1.1rem; font-weight: 800; color: var(--text); margin-bottom: 0.8rem; }
+        .footer-logo span { color: var(--accent-dark); }
+
+        .benefits {
+            display: flex;
+            gap: 0.8rem;
+            margin-bottom: 1.2rem;
+            flex-wrap: wrap;
+        }
+        .benefit {
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            font-size: 0.75rem;
+            color: var(--muted);
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <a href="index.html" class="logo">online<span>Bakala</span></a>
+</header>
+
+<div class="page">
+    <div class="card">
+        <h1>Create account</h1>
+        <p class="subtitle">Shop smarter on Pakistan's best online store</p>
+
+        <div class="benefits">
+            <div class="benefit">✓ Free delivery</div>
+            <div class="benefit">✓ Easy returns</div>
+            <div class="benefit">✓ Secure payments</div>
+        </div>
+
+        <div class="error-box" id="error-box"></div>
+        <div class="success-box" id="success-box"></div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label>First Name</label>
+                <input type="text" id="fname" placeholder="Muhammad" autocomplete="given-name">
+                <div class="field-error" id="fname-err">Required</div>
+            </div>
+            <div class="form-group">
+                <label>Last Name</label>
+                <input type="text" id="lname" placeholder="Ali" autocomplete="family-name">
+                <div class="field-error" id="lname-err">Required</div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>Email address</label>
+            <input type="email" id="email" placeholder="you@example.com" autocomplete="email">
+            <div class="field-error" id="email-err">Enter a valid email address.</div>
+        </div>
+
+        <div class="form-group">
+            <label>Mobile number</label>
+            <div class="phone-wrapper">
+                <span class="phone-prefix">🇵🇰 +92</span>
+                <input type="tel" id="phone" placeholder="3XX-XXXXXXX"
+                       autocomplete="tel" maxlength="11"
+                       oninput="this.value=this.value.replace(/[^0-9]/g,'')">
+            </div>
+            <div class="field-error" id="phone-err">Enter a valid Pakistani mobile number.</div>
+        </div>
+
+        <div class="form-group">
+            <label>
+                Password
+                <span class="show-pwd" onclick="togglePwd('password','show1')">Show</span>
+            </label>
+            <input type="password" id="password" placeholder="At least 8 characters"
+                   autocomplete="new-password" oninput="checkStrength(this.value)">
+            <div class="pwd-strength" id="pwd-strength">
+                <div class="strength-bar">
+                    <div class="strength-fill" id="strength-fill"></div>
+                </div>
+                <span class="strength-text" id="strength-text"></span>
+            </div>
+            <div class="field-error" id="pwd-err">Password must be 8+ chars with uppercase, lowercase and number.</div>
+        </div>
+
+        <div class="form-group">
+            <label>
+                Re-enter password
+                <span class="show-pwd" onclick="togglePwd('confirm','show2')">Show</span>
+            </label>
+            <input type="password" id="confirm" placeholder="Re-enter your password" autocomplete="new-password">
+            <div class="field-error" id="confirm-err">Passwords do not match.</div>
+        </div>
+
+        <button class="btn-create" id="create-btn" onclick="signup()">
+            Create your onlineBakala account
+        </button>
+
+        <p class="terms">
+            By creating an account, you agree to onlineBakala's
+            <a href="#">Conditions of Use</a> and
+            <a href="#">Privacy Notice</a>.
+        </p>
+
+        <div class="divider"><span>Already have an account?</span></div>
+        <a href="login.html" class="btn-signin">Sign in →</a>
+    </div>
+</div>
+
+<footer>
+    <div class="footer-logo">online<span>Bakala</span></div>
+    <div class="footer-links">
+        <a href="#">Conditions of Use</a>
+        <a href="#">Privacy Notice</a>
+        <a href="#">Help</a>
+    </div>
+    <div class="footer-copy">© 2026 onlineBakala.pk</div>
+</footer>
+
+<script>
+function togglePwd(id) {
+    const i = document.getElementById(id);
+    const s = event.target;
+    if (i.type === 'password') { i.type = 'text'; s.textContent = 'Hide'; }
+    else { i.type = 'password'; s.textContent = 'Show'; }
+}
+
+function checkStrength(pwd) {
+    const el = document.getElementById('pwd-strength');
+    const fill = document.getElementById('strength-fill');
+    const text = document.getElementById('strength-text');
+    if (!pwd) { el.style.display = 'none'; return; }
+    el.style.display = 'block';
+
+    let score = 0;
+    if (pwd.length >= 8) score++;
+    if (/[A-Z]/.test(pwd)) score++;
+    if (/[0-9]/.test(pwd)) score++;
+    if (/[^A-Za-z0-9]/.test(pwd)) score++;
+
+    const levels = [
+        { w: '25%', c: '#e74c3c', t: 'Weak' },
+        { w: '50%', c: '#e67e22', t: 'Fair' },
+        { w: '75%', c: '#f1c40f', t: 'Good' },
+        { w: '100%', c: '#27ae60', t: 'Strong' }
+    ];
+    const l = levels[score - 1] || levels[0];
+    fill.style.width = l.w;
+    fill.style.background = l.c;
+    text.textContent = l.t;
+    text.style.color = l.c;
+}
+
+function clearErrors() {
+    document.getElementById('error-box').style.display = 'none';
+    document.querySelectorAll('.field-error').forEach(e => e.style.display = 'none');
+    document.querySelectorAll('input').forEach(i => i.classList.remove('err'));
+}
+
+function fieldErr(errId, inputId) {
+    document.getElementById(errId).style.display = 'block';
+    document.getElementById(inputId).classList.add('err');
+}
+
+async function signup() {
+    clearErrors();
+    const fname = document.getElementById('fname').value.trim();
+    const lname = document.getElementById('lname').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const phone = document.getElementById('phone').value.trim();
+    const password = document.getElementById('password').value;
+    const confirm = document.getElementById('confirm').value;
+
+    let valid = true;
+    if (!fname) { fieldErr('fname-err','fname'); valid = false; }
+    if (!lname) { fieldErr('lname-err','lname'); valid = false; }
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        fieldErr('email-err','email'); valid = false;
+    }
+    if (!phone || phone.length < 10) {
+        fieldErr('phone-err','phone'); valid = false;
+    }
+    if (!password || password.length < 8 ||
+        !/[A-Z]/.test(password) || !/[a-z]/.test(password) || !/[0-9]/.test(password)) {
+        fieldErr('pwd-err','password'); valid = false;
+    }
+    if (password !== confirm) {
+        fieldErr('confirm-err','confirm'); valid = false;
+    }
+    if (!valid) return;
+
+    const btn = document.getElementById('create-btn');
+    btn.disabled = true;
+    btn.textContent = 'Creating account...';
+
+    try {
+        const res = await fetch('/api/auth/signup', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ email, password }),
+            credentials: 'include'
+        });
+        const data = await res.json();
+
+        if (res.ok) {
+            const s = document.getElementById('success-box');
+            s.textContent = `Welcome to onlineBakala, ${fname}! Redirecting to sign in...`;
+            s.style.display = 'block';
+            setTimeout(() => window.location.href = 'login.html', 2000);
+        } else {
+            const box = document.getElementById('error-box');
+            box.textContent = data.errors?.[0]?.msg || data.error || 'Registration failed.';
+            box.style.display = 'block';
+            btn.disabled = false;
+            btn.textContent = 'Create your onlineBakala account';
+        }
+    } catch {
+        const box = document.getElementById('error-box');
+        box.textContent = 'Connection error. Please try again.';
+        box.style.display = 'block';
+        btn.disabled = false;
+        btn.textContent = 'Create your onlineBakala account';
+    }
+}
+
+document.addEventListener('keypress', e => { if (e.key === 'Enter') signup(); });
+if (localStorage.getItem('user')) window.location.href = 'dashboard.html';
+</script>
+</body>
+</html>

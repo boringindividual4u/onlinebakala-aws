@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout - onlineBakala</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #131921;
+            --secondary: #232f3e;
+            --accent: #febd69;
+            --accent-dark: #f3a847;
+            --blue: #007185;
+            --red: #B12704;
+            --green: #007600;
+            --text: #0F1111;
+            --muted: #565959;
+            --border: #DDD;
+            --bg: #eaeded;
+            --card-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', Arial, sans-serif; background: var(--bg); color: var(--text); }
+
+        header {
+            background: var(--primary);
+            padding: 0.8rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid #3a4553;
+        }
+        .logo {
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: white;
+            text-decoration: none;
+        }
+        .logo span { color: var(--accent); }
+        .secure-badge {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            color: #aaa;
+            font-size: 0.82rem;
+        }
+
+        .checkout-steps {
+            background: white;
+            padding: 0.8rem 2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.82rem;
+            border-bottom: 1px solid var(--border);
+            flex-wrap: wrap;
+        }
+        .step-item {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            color: var(--muted);
+        }
+        .step-item.active { color: #c45500; font-weight: 700; }
+        .step-item.done { color: var(--blue); }
+        .step-arrow { color: var(--muted); }
+
+        .main {
+            max-width: 1050px;
+            margin: 1.5rem auto;
+            padding: 0 1rem;
+            display: grid;
+            grid-template-columns: 1fr 330px;
+            gap: 1.5rem;
+            align-items: start;
+        }
+
+        .section-card {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.3rem;
+            margin-bottom: 1rem;
+            box-shadow: var(--card-shadow);
+        }
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            margin-bottom: 1.1rem;
+        }
+        .section-num {
+            width: 22px;
+            height: 22px;
+            background: var(--accent-dark);
+            color: var(--primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 800;
+            flex-shrink: 0;
+        }
+        .section-title { font-size: 1.05rem; font-weight: 700; }
+
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; }
+        .form-group { margin-bottom: 0.8rem; }
+        label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 0.25rem;
+        }
+        input, select {
+            width: 100%;
+            padding: 0.55rem 0.8rem;
+            border: 1px solid #a6a6a6;
+            border-radius: 4px;
+            font-size: 0.88rem;
+            outline: none;
+            font-family: inherit;
+            background: white;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        input:focus, select:focus {
+            border-color: #e77600;
+            box-shadow: 0 0 0 3px rgba(231,118,0,0.2);
+        }
+        input.err { border-color: var(--red); }
+        .field-error {
+            font-size: 0.72rem;
+            color: var(--red);
+            margin-top: 0.2rem;
+            display: none;
+        }
+
+        .phone-wrap { display: flex; gap: 0.5rem; }
+        .phone-pre {
+            padding: 0.55rem 0.6rem;
+            border: 1px solid #a6a6a6;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            background: #f9f9f9;
+            white-space: nowrap;
+            font-family: inherit;
+        }
+
+        /* PAYMENT METHODS */
+        .pm-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.6rem;
+            margin-bottom: 1rem;
+        }
+        .pm-option {
+            border: 2px solid var(--border);
+            border-radius: 6px;
+            padding: 0.7rem 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            font-size: 0.82rem;
+            font-weight: 500;
+        }
+        .pm-option:hover { border-color: #e77600; }
+        .pm-option.selected { border-color: #e77600; background: #fffbf2; }
+        .pm-option input[type=radio] { accent-color: #e77600; }
+        .pm-icon-big { font-size: 1.4rem; }
+
+        .pm-fields { margin-top: 0.8rem; }
+
+        .card-num-wrap { position: relative; }
+        .card-logos {
+            position: absolute;
+            right: 0.7rem;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.1rem;
+        }
+
+        .cod-box {
+            background: #f0fff4;
+            border: 1px solid #27ae60;
+            border-radius: 6px;
+            padding: 0.9rem;
+            font-size: 0.85rem;
+            color: #155724;
+        }
+        .cod-box p { margin-top: 0.3rem; font-size: 0.78rem; color: var(--muted); }
+
+        .mobile-pay-box {
+            background: #f5f9ff;
+            border: 1px solid #90caf9;
+            border-radius: 6px;
+            padding: 0.9rem;
+            font-size: 0.85rem;
+        }
+
+        /* ORDER SUMMARY */
+        .summary-box {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.2rem;
+            box-shadow: var(--card-shadow);
+            position: sticky;
+            top: 1rem;
+        }
+        .summary-title {
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            padding-bottom: 0.8rem;
+            border-bottom: 1px solid var(--border);
+        }
+        .summary-item {
+            display: flex;
+            gap: 0.8rem;
+            margin-bottom: 0.8rem;
+            align-items: center;
+        }
+        .summary-item img {
+            width: 55px;
+            height: 55px;
+            object-fit: cover;
+            border-radius: 4px;
+            border: 1px solid var(--border);
+            flex-shrink: 0;
+        }
+        .si-name { font-size: 0.8rem; font-weight: 600; line-height: 1.3; }
+        .si-price { font-size: 0.82rem; color: var(--red); font-weight: 700; margin-top: 0.2rem; }
+        .si-qty { font-size: 0.72rem; color: var(--muted); }
+
+        .summary-divider { border: none; border-top: 1px solid var(--border); margin: 0.8rem 0; }
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.83rem;
+            margin-bottom: 0.5rem;
+        }
+        .summary-free { color: var(--green); font-weight: 600; }
+        .summary-total {
+            display: flex;
+            justify-content: space-between;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--red);
+            padding-top: 0.7rem;
+            border-top: 1px solid var(--border);
+            margin-top: 0.3rem;
+            margin-bottom: 1rem;
+        }
+        .place-btn {
+            width: 100%;
+            padding: 0.75rem;
+            background: linear-gradient(to bottom, #f7dfa5, #f0c14b);
+            color: var(--text);
+            border: 1px solid #a88734;
+            border-radius: 4px;
+            font-size: 0.92rem;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: inherit;
+            transition: background 0.2s;
+        }
+        .place-btn:hover { background: linear-gradient(to bottom, #f0c14b, #e8ac0e); }
+        .place-btn:disabled { background: #ddd; cursor: not-allowed; border-color: #ccc; }
+        .secure-note {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.3rem;
+            font-size: 0.72rem;
+            color: var(--muted);
+            margin-top: 0.6rem;
+        }
+
+        .error-alert {
+            background: #fff3f3;
+            border: 1px solid #df3312;
+            border-left: 4px solid #df3312;
+            border-radius: 4px;
+            padding: 0.7rem 0.9rem;
+            font-size: 0.82rem;
+            color: #df3312;
+            margin-bottom: 1rem;
+            display: none;
+        }
+
+        /* SUCCESS MODAL */
+        .modal-bg {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.6);
+            z-index: 500;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-bg.show { display: flex; }
+        .modal {
+            background: white;
+            border-radius: 12px;
+            padding: 2.5rem 2rem;
+            text-align: center;
+            max-width: 420px;
+            width: 90%;
+            animation: pop 0.3s ease;
+        }
+        @keyframes pop {
+            from { transform: scale(0.85); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        .modal-icon { font-size: 4rem; margin-bottom: 1rem; }
+        .modal h2 { font-size: 1.4rem; margin-bottom: 0.5rem; }
+        .modal-orderid {
+            background: #f7f7f7;
+            border-radius: 4px;
+            padding: 0.5rem 1rem;
+            font-size: 0.85rem;
+            color: var(--muted);
+            margin: 0.5rem 0 1rem;
+            display: inline-block;
+        }
+        .modal p { color: var(--muted); font-size: 0.88rem; margin-bottom: 1.2rem; line-height: 1.5; }
+        .modal-btn {
+            background: linear-gradient(to bottom, #f7dfa5, #f0c14b);
+            color: var(--text);
+            padding: 0.7rem 2rem;
+            border: 1px solid #a88734;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: inherit;
+            margin: 0.3rem;
+        }
+        .modal-btn-sec {
+            background: white;
+            color: var(--blue);
+            padding: 0.7rem 2rem;
+            border: 1px solid var(--blue);
+            border-radius: 4px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            font-family: inherit;
+            margin: 0.3rem;
+        }
+
+        @media (max-width: 768px) {
+            .main { grid-template-columns: 1fr; }
+            .form-row { grid-template-columns: 1fr; }
+            .pm-grid { grid-template-columns: 1fr 1fr; }
+            .summary-box { position: relative; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <a href="index.html" class="logo">online<span>Bakala</span></a>
+    <div class="secure-badge">🔒 Secure checkout</div>
+</header>
+
+<div class="checkout-steps">
+    <div class="step-item done">🛒 Cart</div>
+    <span class="step-arrow">›</span>
+    <div class="step-item active">📋 Checkout</div>
+    <span class="step-arrow">›</span>
+    <div class="step-item">✅ Order Placed</div>
+</div>
+
+<div class="main">
+    <div>
+        <div class="error-alert" id="error-alert"></div>
+
+        <!-- ADDRESS -->
+        <div class="section-card">
+            <div class="section-header">
+                <div class="section-num">1</div>
+                <div class="section-title">Delivery Address</div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>First Name *</label>
+                    <input type="text" id="fname" placeholder="Muhammad" autocomplete="given-name">
+                    <div class="field-error" id="fname-err">Required</div>
+                </div>
+                <div class="form-group">
+                    <label>Last Name *</label>
+                    <input type="text" id="lname" placeholder="Ali" autocomplete="family-name">
+                    <div class="field-error" id="lname-err">Required</div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Street Address *</label>
+                <input type="text" id="address" placeholder="House No., Street, Area" autocomplete="street-address">
+                <div class="field-error" id="address-err">Required</div>
+            </div>
+            <div class="form-group">
+                <label>Apartment, Suite (optional)</label>
+                <input type="text" id="address2" placeholder="Apt, Floor, Building (optional)">
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>City *</label>
+                    <select id="city" autocomplete="address-level2">
+                        <option value="">Select city</option>
+                        <option>Karachi</option>
+                        <option>Lahore</option>
+                        <option>Islamabad</option>
+                        <option>Faisalabad</option>
+                        <option>Rawalpindi</option>
+                        <option>Peshawar</option>
+                        <option>Quetta</option>
+                        <option>Multan</option>
+                        <option>Sialkot</option>
+                        <option>Gujranwala</option>
+                        <option>Hyderabad</option>
+                        <option>Other</option>
+                    </select>
+                    <div class="field-error" id="city-err">Required</div>
+                </div>
+                <div class="form-group">
+                    <label>Province</label>
+                    <select id="province">
+                        <option value="">Select province</option>
+                        <option>Punjab</option>
+                        <option>Sindh</option>
+                        <option>KPK</option>
+                        <option>Balochistan</option>
+                        <option>Islamabad (ICT)</option>
+                        <option>AJK</option>
+                        <option>Gilgit-Baltistan</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Mobile Number *</label>
+                <div class="phone-wrap">
+                    <span class="phone-pre">🇵🇰 +92</span>
+                    <input type="tel" id="phone" placeholder="3XX-XXXXXXX"
+                           maxlength="11" autocomplete="tel"
+                           oninput="this.value=this.value.replace(/[^0-9]/g,'')">
+                </div>
+                <div class="field-error" id="phone-err">Enter valid mobile number</div>
+            </div>
+        </div>
+
+        <!-- PAYMENT -->
+        <div class="section-card">
+            <div class="section-header">
+                <div class="section-num">2</div>
+                <div class="section-title">Payment Method</div>
+            </div>
+
+            <div class="pm-grid">
+                <label class="pm-option selected" id="pm-card" onclick="selectPM('card')">
+                    <input type="radio" name="pm" value="card" checked>
+                    <span class="pm-icon-big">💳</span>
+                    <span>Credit / Debit Card</span>
+                </label>
+                <label class="pm-option" id="pm-jazzcash" onclick="selectPM('jazzcash')">
+                    <input type="radio" name="pm" value="jazzcash">
+                    <span class="pm-icon-big">📱</span>
+                    <span>JazzCash</span>
+                </label>
+                <label class="pm-option" id="pm-easypaisa" onclick="selectPM('easypaisa')">
+                    <input type="radio" name="pm" value="easypaisa">
+                    <span class="pm-icon-big">💚</span>
+                    <span>Easypaisa</span>
+                </label>
+                <label class="pm-option" id="pm-cod" onclick="selectPM('cod')">
+                    <input type="radio" name="pm" value="cod">
+                    <span class="pm-icon-big">💵</span>
+                    <span>Cash on Delivery</span>
+                </label>
+            </div>
+
+            <!-- Card fields -->
+            <div class="pm-fields" id="fields-card">
+                <div class="form-group">
+                    <label>Card Number *</label>
+                    <div class="card-num-wrap">
+                        <input type="text" id="card-num" placeholder="1234 5678 9012 3456"
+                               maxlength="19" oninput="fmtCard(this)"
+                               autocomplete="cc-number">
+                        <span class="card-logos">💳</span>
+                    </div>
+                    <div class="field-error" id="card-err">Enter valid card number</div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Expiry Date *</label>
+                        <input type="text" id="expiry" placeholder="MM / YY"
+                               maxlength="7" oninput="fmtExpiry(this)"
+                               autocomplete="cc-exp">
+                        <div class="field-error" id="exp-err">Enter valid expiry</div>
+                    </div>
+                    <div class="form-group">
+                        <label>Security Code *</label>
+                        <input type="password" id="cvv" placeholder="CVV"
+                               maxlength="3" autocomplete="cc-csc">
+                        <div class="field-error" id="cvv-err">Enter 3-digit CVV</div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Name on Card *</label>
+                    <input type="text" id="card-name" placeholder="Muhammad Ali"
+                           autocomplete="cc-name">
+                    <div class="field-error" id="cname-err">Required</div>
+                </div>
+            </div>
+
+            <!-- JazzCash -->
+            <div class="pm-fields" id="fields-jazzcash" style="display:none">
+                <div class="mobile-pay-box">
+                    <strong>📱 JazzCash Mobile Payment</strong>
+                    <div class="form-group" style="margin-top:0.8rem;margin-bottom:0">
+                        <label>JazzCash Number *</label>
+                        <div class="phone-wrap">
+                            <span class="phone-pre">🇵🇰 +92</span>
+                            <input type="tel" id="jc-num" placeholder="3XX-XXXXXXX"
+                                   maxlength="11">
+                        </div>
+                    </div>
+                    <p style="font-size:0.78rem;color:var(--muted);margin-top:0.5rem">
+                        You'll receive a payment request on your JazzCash app. Approve it to complete your order.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Easypaisa -->
+            <div class="pm-fields" id="fields-easypaisa" style="display:none">
+                <div class="mobile-pay-box">
+                    <strong>💚 Easypaisa Mobile Payment</strong>
+                    <div class="form-group" style="margin-top:0.8rem;margin-bottom:0">
+                        <label>Easypaisa Number *</label>
+                        <div class="phone-wrap">
+                            <span class="phone-pre">🇵🇰 +92</span>
+                            <input type="tel" id="ep-num" placeholder="3XX-XXXXXXX"
+                                   maxlength="11">
+                        </div>
+                    </div>
+                    <p style="font-size:0.78rem;color:var(--muted);margin-top:0.5rem">
+                        You'll receive a payment request on your Easypaisa app. Approve it to complete your order.
+                    </p>
+                </div>
+            </div>
+
+            <!-- COD -->
+            <div class="pm-fields" id="fields-cod" style="display:none">
+                <div class="cod-box">
+                    <strong>✓ Cash on Delivery selected</strong>
+                    <p>Pay when your order arrives at your doorstep. Available nationwide.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- REVIEW -->
+        <div class="section-card">
+            <div class="section-header">
+                <div class="section-num">3</div>
+                <div class="section-title">Review Items and Delivery</div>
+            </div>
+            <div id="review-items" style="color:var(--muted);font-size:0.85rem">Loading...</div>
+        </div>
+    </div>
+
+    <!-- SUMMARY -->
+    <div class="summary-box">
+        <div class="summary-title">Order Summary</div>
+        <div id="summary-items"></div>
+        <hr class="summary-divider">
+        <div class="summary-row">
+            <span>Items (<span id="s-count">0</span>)</span>
+            <span id="s-items">PKR 0</span>
+        </div>
+        <div class="summary-row">
+            <span>Shipping</span>
+            <span class="summary-free">FREE</span>
+        </div>
+        <div class="summary-row">
+            <span>Tax</span>
+            <span>PKR 0</span>
+        </div>
+        <div class="summary-total">
+            <span>Order total:</span>
+            <span id="s-total">PKR 0</span>
+        </div>
+        <button class="place-btn" id="place-btn" onclick="placeOrder()">
+            Place your order
+        </button>
+        <div class="secure-note">🔒 Secure and encrypted</div>
+        <div style="font-size:0.72rem;color:var(--muted);margin-top:0.8rem;text-align:center;line-height:1.5">
+            By placing your order, you agree to onlineBakala's
+            <a href="#" style="color:var(--blue)">privacy notice</a> and
+            <a href="#" style="color:var(--blue)">conditions of use</a>.
+        </div>
+    </div>
+</div>
+
+<!-- SUCCESS MODAL -->
+<div class="modal-bg" id="modal-bg">
+    <div class="modal">
+        <div class="modal-icon">🎉</div>
+        <h2>Order Placed!</h2>
+        <div class="modal-orderid" id="modal-orderid">Order #0</div>
+        <p id="modal-msg">
+            Thank you for shopping with onlineBakala!<br>
+            Your order has been confirmed and will be delivered soon.
+        </p>
+        <div>
+            <button class="modal-btn" onclick="window.location.href='orders.html'">
+                View My Orders
+            </button>
+            <button class="modal-btn-sec" onclick="window.location.href='dashboard.html'">
+                Continue Shopping
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+const user = JSON.parse(localStorage.getItem('user') || 'null');
+if (!user) window.location.href = 'login.html';
+
+let cartItems = [];
+let selectedPM = 'card';
+
+function formatPrice(p) { return 'PKR ' + parseFloat(p).toLocaleString('en-PK'); }
+
+function fmtCard(input) {
+    let v = input.value.replace(/\D/g,'').substring(0,16);
+    input.value = v.match(/.{1,4}/g)?.join(' ') || v;
+}
+function fmtExpiry(input) {
+    let v = input.value.replace(/\D/g,'');
+    if (v.length >= 2) v = v.substring(0,2) + ' / ' + v.substring(2,4);
+    input.value = v;
+}
+
+function selectPM(pm) {
+    selectedPM = pm;
+    document.querySelectorAll('.pm-option').forEach(el => el.classList.remove('selected'));
+    document.getElementById('pm-' + pm).classList.add('selected');
+    ['card','jazzcash','easypaisa','cod'].forEach(p => {
+        document.getElementById('fields-' + p).style.display = p === pm ? 'block' : 'none';
+    });
+}
+
+function clearErrors() {
+    document.getElementById('error-alert').style.display = 'none';
+    document.querySelectorAll('.field-error').forEach(e => e.style.display = 'none');
+    document.querySelectorAll('input.err, select.err').forEach(i => i.classList.remove('err'));
+}
+
+function fieldErr(errId, inputId) {
+    const e = document.getElementById(errId);
+    const i = document.getElementById(inputId);
+    if (e) e.style.display = 'block';
+    if (i) i.classList.add('err');
+    return false;
+}
+
+function validate() {
+    clearErrors();
+    let ok = true;
+    if (!document.getElementById('fname').value.trim())
+        { fieldErr('fname-err','fname'); ok = false; }
+    if (!document.getElementById('lname').value.trim())
+        { fieldErr('lname-err','lname'); ok = false; }
+    if (!document.getElementById('address').value.trim())
+        { fieldErr('address-err','address'); ok = false; }
+    if (!document.getElementById('city').value)
+        { fieldErr('city-err','city'); ok = false; }
+    const ph = document.getElementById('phone').value;
+    if (!ph || ph.length < 10)
+        { fieldErr('phone-err','phone'); ok = false; }
+
+    if (selectedPM === 'card') {
+        const cn = document.getElementById('card-num').value.replace(/\s/g,'');
+        if (cn.length !== 16) { fieldErr('card-err','card-num'); ok = false; }
+        const ex = document.getElementById('expiry').value.replace(/\s/g,'');
+        if (!ex.match(/^\d{2}\/\d{2}$/)) { fieldErr('exp-err','expiry'); ok = false; }
+        if (document.getElementById('cvv').value.length !== 3)
+            { fieldErr('cvv-err','cvv'); ok = false; }
+        if (!document.getElementById('card-name').value.trim())
+            { fieldErr('cname-err','card-name'); ok = false; }
+    }
+    return ok;
+}
+
+async function placeOrder() {
+    if (!validate()) {
+        document.getElementById('error-alert').textContent =
+            'Please fill in all required fields correctly.';
+        document.getElementById('error-alert').style.display = 'block';
+        window.scrollTo({top:0, behavior:'smooth'});
+        return;
+    }
+
+    const btn = document.getElementById('place-btn');
+    btn.disabled = true;
+    btn.textContent = 'Processing...';
+
+    await new Promise(r => setTimeout(r, 1500));
+
+    try {
+        const res = await fetch('/api/orders', {
+            method: 'POST',
+            credentials: 'include'
+        });
+        const data = await res.json();
+
+        if (res.ok) {
+            const pmNames = {
+                card:'Credit/Debit Card',
+                jazzcash:'JazzCash',
+                easypaisa:'Easypaisa',
+                cod:'Cash on Delivery'
+            };
+            document.getElementById('modal-orderid').textContent = 'Order #' + data.orderId;
+            document.getElementById('modal-msg').innerHTML = `
+                Thank you for shopping with onlineBakala!<br>
+                Payment: ${pmNames[selectedPM]}<br>
+                <small style="color:var(--muted)">Estimated delivery: 3-5 business days</small>`;
+            document.getElementById('modal-bg').classList.add('show');
+        } else {
+            document.getElementById('error-alert').textContent =
+                data.error || 'Failed to place order.';
+            document.getElementById('error-alert').style.display = 'block';
+            btn.disabled = false;
+            btn.textContent = 'Place your order';
+        }
+    } catch {
+        document.getElementById('error-alert').textContent =
+            'Connection error. Please try again.';
+        document.getElementById('error-alert').style.display = 'block';
+        btn.disabled = false;
+        btn.textContent = 'Place your order';
+    }
+}
+
+async function loadCart() {
+    try {
+        const res = await fetch('/api/cart', {credentials:'include'});
+        cartItems = await res.json();
+        if (!cartItems.length) {
+            window.location.href = 'cart.html';
+            return;
+        }
+        renderSummary();
+        renderReview();
+    } catch { window.location.href = 'cart.html'; }
+}
+
+function renderSummary() {
+    const total = cartItems.reduce((s,i) => s + parseFloat(i.price)*i.quantity, 0);
+    const count = cartItems.reduce((s,i) => s + i.quantity, 0);
+    document.getElementById('s-count').textContent = count;
+    document.getElementById('s-items').textContent = formatPrice(total);
+    document.getElementById('s-total').textContent = formatPrice(total);
+    document.getElementById('summary-items').innerHTML = cartItems.map(item => `
+        <div class="summary-item">
+            <img src="${item.image_url}" alt="${item.name}"
+                 onerror="this.src='https://via.placeholder.com/55'">
+            <div>
+                <div class="si-name">${item.name}</div>
+                <div class="si-qty">Qty: ${item.quantity}</div>
+                <div class="si-price">${formatPrice(item.price * item.quantity)}</div>
+            </div>
+        </div>`).join('');
+}
+
+function renderReview() {
+    document.getElementById('review-items').innerHTML = cartItems.map(item => `
+        <div style="display:flex;gap:0.8rem;padding:0.7rem 0;border-bottom:1px solid #f5f5f5;align-items:center">
+            <img src="${item.image_url}" alt="${item.name}"
+                 style="width:60px;height:60px;object-fit:cover;border-radius:4px;border:1px solid var(--border)"
+                 onerror="this.src='https://via.placeholder.com/60'">
+            <div style="flex:1">
+                <div style="font-size:0.88rem;font-weight:600">${item.name}</div>
+                <div style="font-size:0.75rem;color:var(--green);margin:0.2rem 0">✓ In Stock</div>
+                <div style="font-size:0.78rem;color:var(--muted)">Qty: ${item.quantity}</div>
+            </div>
+            <div style="font-size:0.9rem;font-weight:700;color:var(--red)">
+                ${formatPrice(item.price * item.quantity)}
+            </div>
+        </div>`).join('');
+}
+
+loadCart();
+</script>
+</body>
+</html>
