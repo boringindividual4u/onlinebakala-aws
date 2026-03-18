@@ -1,4 +1,5 @@
 require('dotenv').config();
+const { SecretsManagerClient, GetSecretValueCommand } = require('@aws-sdk/client-secrets-manager');
 const express = require('express');
 const mysql = require('mysql2/promise');
 const bcrypt = require('bcrypt');
@@ -36,16 +37,7 @@ app.use(cookieParser(process.env.COOKIE_SECRET));
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Database connection pool
-const db = mysql.createPool({
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASS,
-  database: process.env.DB_NAME,
-  waitForConnections: true,
-  connectionLimit: 10,
-  connectTimeout: 10000,
-  ssl: false
-});
+let db;
 // OWASP A04 - Rate limiting on auth routes
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
@@ -552,7 +544,35 @@ app.use((req, res) => {
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`onlineBakala server running on port ${PORT}`);
-  console.log(`Environment: ${process.env.NODE_ENV}`);
-});
+
+async function startServer() {
+  try {
+    const client = new SecretsManagerClient({ region: 'eu-west-1' });
+    const command = new GetSecretValueCommand({ SecretId: 'prod/netflix-app/rds' });
+    const response = await client.send(command);
+    const creds = JSON.parse(response.SecretString);
+
+    db = mysql.createPool({
+      host: process.env.DB_HOST,
+      user: creds.username,
+      password: creds.password,
+      database: process.env.DB_NAME,
+      waitForConnections: true,
+      connectionLimit: 10,
+      connectTimeout: 10000,
+      ssl: false
+    });
+
+    console.log('DB pool created via Secrets Manager');
+
+    app.listen(PORT, () => {
+      console.log(`onlineBakala server running on port ${PORT}`);
+      console.log(`Environment: ${process.env.NODE_ENV}`);
+    });
+  } catch (err) {
+    console.error('FATAL - Failed to start server:', err.message);
+    process.exit(1);
+  }
+}
+
+startServer();
