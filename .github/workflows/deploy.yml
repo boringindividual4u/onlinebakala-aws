@@ -21,10 +21,8 @@ jobs:
 
     - name: Run tests
       run: |
-        # Health check — server.js must exist and have no syntax errors
-        node --check server.js && echo "Syntax OK"
-        # Confirm no hardcoded passwords
-        grep -r "DB_PASS\s*:" server.js && echo "FAIL - hardcoded password found" && exit 1 || echo "PASS - no hardcoded passwords"
+        node --check server.js && echo "PASS - Syntax OK"
+        grep -r "DB_PASS\s*:" server.js && echo "FAIL - hardcoded password" && exit 1 || echo "PASS - no hardcoded passwords"
 
   deploy:
     runs-on: ubuntu-latest
@@ -33,53 +31,77 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
-    - name: Copy app files to EC2
-      uses: appleboy/scp-action@master
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
       with:
-        host: ${{ secrets.EC2_HOST }}
-        username: ec2-user
-        key: ${{ secrets.EC2_KEY }}
-        source: "server.js,package.json,package-lock.json,ecosystem.config.js,*.html"
-        target: "/home/ec2-user/onlinebakala/"
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ secrets.AWS_REGION }}
 
-    - name: Install dependencies and restart app
-      uses: appleboy/ssh-action@master
-      with:
-        host: ${{ secrets.EC2_HOST }}
-        username: ec2-user
-        key: ${{ secrets.EC2_KEY }}
-        command_timeout: 120s
-        script: |
-          cd /home/ec2-user/onlinebakala
-          npm install --production
-          pm2 restart onlinebakala
-          sleep 5
-          pm2 list
-          # Health check — confirm app is running
-          curl -f http://localhost:3000/health && echo "DEPLOY SUCCESS" || echo "DEPLOY FAILED - check logs"
+    - name: Deploy via SSM
+      run: |
+        COMMAND_ID=$(aws ssm send-command \
+          --instance-ids "${{ secrets.EC2_INSTANCE_ID }}" \
+          --document-name "AWS-RunShellScript" \
+          --parameters 'commands=[
+            "cd /home/ec2-user/onlinebakala-repo",
+            "git pull origin main",
+            "cp server.js /home/ec2-user/onlinebakala/server.js",
+            "cp ecosystem.config.js /home/ec2-user/onlinebakala/ecosystem.config.js",
+            "cp package.json /home/ec2-user/onlinebakala/package.json",
+            "cp package-lock.json /home/ec2-user/onlinebakala/package-lock.json",
+            "cp *.html /home/ec2-user/onlinebakala/",
+            "cd /home/ec2-user/onlinebakala",
+            "npm install --production",
+            "pm2 restart onlinebakala",
+            "sleep 5",
+            "curl -f http://localhost:3000/health && echo DEPLOY_SUCCESS || echo DEPLOY_FAILED"
+          ]' \
+          --region eu-west-1 \
+          --query 'Command.CommandId' \
+          --output text)
 
-    - name: Bake new AMI and refresh ASG
-      uses: appleboy/ssh-action@master
-      with:
-        host: ${{ secrets.EC2_HOST }}
-        username: ec2-user
-        key: ${{ secrets.EC2_KEY }}
-        command_timeout: 300s
-        script: |
-          INSTANCE_ID=$(curl -s http://169.254.169.254/latest/meta-data/instance-id)
-          TIMESTAMP=$(date +%Y%m%d-%H%M%S)
-          AMI_NAME="onlinebakala-v-${TIMESTAMP}"
+        echo "SSM Command ID: $COMMAND_ID"
 
-          echo "Creating AMI: ${AMI_NAME} from ${INSTANCE_ID}"
-
-          AMI_ID=$(aws ec2 create-image \
-            --instance-id $INSTANCE_ID \
-            --name "$AMI_NAME" \
-            --no-reboot \
+        # Wait for command to complete (max 2 minutes)
+        for i in {1..24}; do
+          STATUS=$(aws ssm get-command-invocation \
+            --command-id "$COMMAND_ID" \
+            --instance-id "${{ secrets.EC2_INSTANCE_ID }}" \
             --region eu-west-1 \
-            --query 'ImageId' \
-            --output text)
+            --query 'Status' \
+            --output text 2>/dev/null || echo "Pending")
 
-          echo "AMI created: ${AMI_ID}"
-          echo "AMI will be used by ASG for new instances automatically"
-          echo "Existing instances already have latest code via direct deploy"
+          echo "Status: $STATUS"
+
+          if [ "$STATUS" = "Success" ]; then
+            echo "Deploy succeeded"
+            break
+          elif [ "$STATUS" = "Failed" ] || [ "$STATUS" = "Cancelled" ]; then
+            echo "Deploy FAILED"
+            aws ssm get-command-invocation \
+              --command-id "$COMMAND_ID" \
+              --instance-id "${{ secrets.EC2_INSTANCE_ID }}" \
+              --region eu-west-1 \
+              --query 'StandardErrorContent' \
+              --output text
+            exit 1
+          fi
+          sleep 5
+        done
+
+    - name: Bake new AMI for ASG
+      run: |
+        TIMESTAMP=$(date +%Y%m%d-%H%M%S)
+        AMI_NAME="onlinebakala-v-${TIMESTAMP}"
+
+        AMI_ID=$(aws ec2 create-image \
+          --instance-id "${{ secrets.EC2_INSTANCE_ID }}" \
+          --name "$AMI_NAME" \
+          --no-reboot \
+          --region eu-west-1 \
+          --query 'ImageId' \
+          --output text)
+
+        echo "New AMI created: $AMI_ID"
+        echo "ASG new instances will use this AMI"
