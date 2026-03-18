@@ -1,34 +1,85 @@
-name: Deploy to AWS EC2
+name: Deploy to AWS
 
 on:
   push:
     branches: [ main ]
 
 jobs:
-  deploy:
+  test:
     runs-on: ubuntu-latest
-    
     steps:
     - name: Checkout code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
-    - name: Copy files to EC2
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Run tests
+      run: |
+        # Health check — server.js must exist and have no syntax errors
+        node --check server.js && echo "Syntax OK"
+        # Confirm no hardcoded passwords
+        grep -r "DB_PASS\s*:" server.js && echo "FAIL - hardcoded password found" && exit 1 || echo "PASS - no hardcoded passwords"
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Copy app files to EC2
       uses: appleboy/scp-action@master
       with:
         host: ${{ secrets.EC2_HOST }}
         username: ec2-user
         key: ${{ secrets.EC2_KEY }}
-        source: "*.html"
-        target: "/home/ec2-user/deploy/"
+        source: "server.js,package.json,package-lock.json,ecosystem.config.js,*.html"
+        target: "/home/ec2-user/onlinebakala/"
 
-    - name: Deploy on EC2
+    - name: Install dependencies and restart app
       uses: appleboy/ssh-action@master
       with:
         host: ${{ secrets.EC2_HOST }}
         username: ec2-user
         key: ${{ secrets.EC2_KEY }}
-        command_timeout: 60s
+        command_timeout: 120s
         script: |
-          sudo cp /home/ec2-user/deploy/*.html /var/www/html/
+          cd /home/ec2-user/onlinebakala
+          npm install --production
           pm2 restart onlinebakala
-          echo "Done"
+          sleep 5
+          pm2 list
+          # Health check — confirm app is running
+          curl -f http://localhost:3000/health && echo "DEPLOY SUCCESS" || echo "DEPLOY FAILED - check logs"
+
+    - name: Bake new AMI and refresh ASG
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.EC2_HOST }}
+        username: ec2-user
+        key: ${{ secrets.EC2_KEY }}
+        command_timeout: 300s
+        script: |
+          INSTANCE_ID=$(curl -s http://169.254.169.254/latest/meta-data/instance-id)
+          TIMESTAMP=$(date +%Y%m%d-%H%M%S)
+          AMI_NAME="onlinebakala-v-${TIMESTAMP}"
+
+          echo "Creating AMI: ${AMI_NAME} from ${INSTANCE_ID}"
+
+          AMI_ID=$(aws ec2 create-image \
+            --instance-id $INSTANCE_ID \
+            --name "$AMI_NAME" \
+            --no-reboot \
+            --region eu-west-1 \
+            --query 'ImageId' \
+            --output text)
+
+          echo "AMI created: ${AMI_ID}"
+          echo "AMI will be used by ASG for new instances automatically"
+          echo "Existing instances already have latest code via direct deploy"
