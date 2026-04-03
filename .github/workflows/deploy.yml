@@ -73,14 +73,12 @@ jobs:
             --region eu-west-1 \
             --query 'Status' \
             --output text 2>/dev/null || echo "Pending")
-
           echo "Status: $STATUS"
-
           if [ "$STATUS" = "Success" ]; then
-            echo "DEPLOY SUCCESS"
+            echo "Deploy to EC2 succeeded"
             break
           elif [ "$STATUS" = "Failed" ] || [ "$STATUS" = "Cancelled" ]; then
-            echo "DEPLOY FAILED"
+            echo "DEPLOY FAILED - stopping before AMI bake"
             aws ssm get-command-invocation \
               --command-id "$COMMAND_ID" \
               --instance-id "${{ secrets.EC2_INSTANCE_ID }}" \
@@ -92,18 +90,49 @@ jobs:
           sleep 5
         done
 
-    - name: Bake new AMI for ASG
+    - name: Bake new AMI
+      id: bake_ami
       run: |
         TIMESTAMP=$(date +%Y%m%d-%H%M%S)
-        AMI_NAME="onlinebakala-v-${TIMESTAMP}"
+        AMI_NAME="onlinebakala-${TIMESTAMP}"
 
         AMI_ID=$(aws ec2 create-image \
           --instance-id "${{ secrets.EC2_INSTANCE_ID }}" \
           --name "$AMI_NAME" \
+          --description "Auto-baked by CI/CD on git push to main" \
           --no-reboot \
           --region eu-west-1 \
           --query 'ImageId' \
           --output text)
 
-        echo "New AMI: $AMI_ID"
-        echo "ASG new instances will use this AMI"
+        echo "New AMI ID: $AMI_ID"
+        echo "AMI_ID=$AMI_ID" >> $GITHUB_OUTPUT
+
+        echo "Waiting for AMI to become available..."
+        aws ec2 wait image-available \
+          --image-ids "$AMI_ID" \
+          --region eu-west-1
+
+        echo "AMI $AMI_ID is ready"
+
+    - name: Update Launch Template with new AMI
+      run: |
+        AMI_ID="${{ steps.bake_ami.outputs.AMI_ID }}"
+
+        NEW_VERSION=$(aws ec2 create-launch-template-version \
+          --launch-template-name "${{ secrets.LAUNCH_TEMPLATE_NAME }}" \
+          --source-version '$Latest' \
+          --launch-template-data "{\"ImageId\":\"${AMI_ID}\"}" \
+          --region eu-west-1 \
+          --query 'LaunchTemplateVersion.VersionNumber' \
+          --output text)
+
+        echo "New Launch Template version: $NEW_VERSION"
+
+        aws ec2 modify-launch-template \
+          --launch-template-name "${{ secrets.LAUNCH_TEMPLATE_NAME }}" \
+          --default-version "$NEW_VERSION" \
+          --region eu-west-1
+
+        echo "Launch Template default is now version $NEW_VERSION (AMI: $AMI_ID)"
+        echo "Any new ASG instance will use the latest code automatically"
